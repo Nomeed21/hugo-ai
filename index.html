@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugo AI Chatbot Test</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f1f5f9; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            height: 90vh;
+        }
+        .chat-container { 
+            width: 100%; 
+            max-width: 600px; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); 
+            display: flex; 
+            flex-direction: column; 
+            height: 600px; 
+        }
+        .chat-header { 
+            background: #2563eb; 
+            color: white; 
+            padding: 18px; 
+            border-top-left-radius: 12px; 
+            border-top-right-radius: 12px; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+        }
+        .chat-messages { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            border-bottom: 1px solid #e2e8f0; 
+            background: #fafafa;
+        }
+        .message { 
+            margin-bottom: 15px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .message.user { 
+            align-items: flex-end; 
+        }
+        .message.bot { 
+            align-items: flex-start; 
+        }
+        .bubble { 
+            max-width: 80%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            line-height: 1.5; 
+            font-size: 0.95rem;
+        }
+        .user .bubble { 
+            background: #2563eb; 
+            color: white; 
+            border-bottom-right-radius: 0; 
+        }
+        .bot .bubble { 
+            background: #e2e8f0; 
+            color: #1e293b; 
+            border-bottom-left-radius: 0; 
+        }
+        .meta { 
+            font-size: 0.75rem; 
+            color: #64748b; 
+            margin-top: 5px; 
+            padding: 0 5px;
+        }
+        .chat-input-area { 
+            display: flex; 
+            padding: 15px; 
+            background: #f8fafc; 
+            border-bottom-left-radius: 12px; 
+            border-bottom-right-radius: 12px; 
+            border-top: 1px solid #e2e8f0;
+        }
+        input { 
+            flex: 1; 
+            padding: 12px 18px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 24px; 
+            outline: none; 
+            margin-right: 12px; 
+            font-size: 0.95rem;
+        }
+        button { 
+            background: #2563eb; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 24px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background 0.2s;
+        }
+        button:hover { 
+            background: #1d4ed8; 
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Hugo AI Testing Page</div>
+        <div id="messages" class="chat-messages">
+            <div class="message bot">
+                <div class="bubble">Hi! I'm Hugo, the AWS Student Builder Group assistant! How can I help you today?</div>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask Hugo a question..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Generate a random session ID for our testing session
+        const sessionId = "local-test-" + Math.random().toString(36).substr(2, 9);
+        const messagesContainer = document.getElementById("messages");
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            // 1. Render User Message
+            appendMessage(text, "user");
+            input.value = "";
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                // 2. Call your local FastAPI backend
+                const response = await fetch("http://127.0.0.1:8000/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                
+                // 3. Format citations and sources metadata
+                let sourcesText = "";
+                if (data.sources && data.sources.length > 0) {
+                    sourcesText = "Sources: " + data.sources.map(s => `${s.section_title} (${s.page_source})`).join(", ");
+                } else {
+                    sourcesText = "No sources cited.";
+                }
+
+                const meta = `Confidence: ${data.confidence.toFixed(2)} | ${sourcesText}`;
+                
+                // 4. Render Hugo Response
+                appendMessage(data.response, "bot", meta);
+
+            } catch (error) {
+                console.error("Error calling backend:", error);
+                appendMessage("Error: Could not connect to your local FastAPI backend. Make sure your Uvicorn server is running on http://127.0.0.1:8000 !", "bot");
+            }
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function appendMessage(text, sender, metaText = "") {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${sender}`;
+
+            const bubbleDiv = document.createElement("div");
+            bubbleDiv.className = "bubble";
+            bubbleDiv.innerText = text;
+            messageDiv.appendChild(bubbleDiv);
+
+            if (metaText) {
+                const metaDiv = document.createElement("div");
+                metaDiv.className = "meta";
+                metaDiv.innerText = metaText;
+                messageDiv.appendChild(metaDiv);
+            }
+
+            messagesContainer.appendChild(messageDiv);
+        }
+    </script>
+</body>
+</html>
