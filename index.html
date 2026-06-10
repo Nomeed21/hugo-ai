@@ -138,14 +138,21 @@
                 <div class="bubble">Hi! I'm Hugo, the AWS Student Builder Group assistant! How can I help you today?</div>
             </div>
         </div>
-        <div class="quick-actions">
-	    <button onclick="setQuickMessage('How do I apply to AWSCC-HUGO?')">
-	        How do I apply to AWSCC-HUGO?
-	    </button>
-	    <button onclick="setQuickMessage('What are the ongoing projects of the club?')">
-	        What are the ongoing projects of the club?
-	    </button>
-	</div>
+        <div class="quick-actions" id="quickActions">
+    <div class="chip" onclick="setQuickMessage('How do I apply to AWSCC-HUGO?')">
+        Apply to AWSCC
+    </div>
+    <div class="chip" onclick="setQuickMessage('What are the ongoing projects?')">
+        Club projects
+    </div>
+    <div class="chip" onclick="setQuickMessage('What is AWS Student Builder Group?')">
+        About the org
+    </div>
+    <div class="chip" onclick="setQuickMessage('How can I join the team?')">
+        Join the team
+    </div>
+</div>
+	
 	<div class="chat-input-area">
             <input type="text" id="userInput" placeholder="Ask Hugo a question..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
@@ -175,7 +182,7 @@
 
             try {
                 // 2. Call your local FastAPI backend
-                const response = await fetch("http://127.0.0.1:8000/chat", {
+                const response = await fetch("https://hugo-ai-4pqk.onrender.com/chat", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
