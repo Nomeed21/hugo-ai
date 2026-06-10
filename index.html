@@ -105,6 +105,29 @@
         button:hover { 
             background: #1d4ed8; 
         }
+	.quick-actions {
+	    display: flex;
+	    gap: 10px;
+	    padding: 10px 15px;
+	    background: #f8fafc;
+	    border-top: 1px solid #e2e8f0;
+	}
+
+	.quick-actions button {
+    	background: #e2e8f0;
+    	color: #1e293b;
+   	 border: none;
+   	 padding: 8px 12px;
+   	 border-radius: 20px;
+   	 font-size: 0.85rem;
+   	 cursor: pointer;
+   	 transition: all 0.2s ease;
+  	 	 white-space: nowrap;
+	}
+
+	.quick-actions button:hover {
+	    background: #cbd5e1;
+	}
     </style>
 </head>
 <body>
@@ -115,7 +138,15 @@
                 <div class="bubble">Hi! I'm Hugo, the AWS Student Builder Group assistant! How can I help you today?</div>
             </div>
         </div>
-        <div class="chat-input-area">
+        <div class="quick-actions">
+	    <button onclick="setQuickMessage('How do I apply to AWSCC-HUGO?')">
+	        How do I apply to AWSCC-HUGO?
+	    </button>
+	    <button onclick="setQuickMessage('What are the ongoing projects of the club?')">
+	        What are the ongoing projects of the club?
+	    </button>
+	</div>
+	<div class="chat-input-area">
             <input type="text" id="userInput" placeholder="Ask Hugo a question..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
         </div>
@@ -196,6 +227,11 @@
 
             messagesContainer.appendChild(messageDiv);
         }
+	function setQuickMessage(text) {
+	    const input = document.getElementById("userInput");
+	    input.value = text;
+	    input.focus();
+	}
     </script>
 </body>
 </html>
