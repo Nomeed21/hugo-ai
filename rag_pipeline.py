@@ -1,4 +1,34 @@
+
 import os
+import gc
+import torch
+
+# 1. Disable PyTorch gradient tracking (we are ONLY doing inference, not training!)
+torch.set_grad_enabled(False)
+
+# 2. Limit PyTorch to 1 CPU thread to prevent memory-heavy thread caches
+torch.set_num_threads(1)
+torch.set_num_interop_threads(1)
+
+from langchain_groq import ChatGroq
+from sentence_transformers import SentenceTransformer
+from supabase import create_client
+
+from prompts import build_prompt, FALLBACK_RESPONSE
+
+# Load environment variables for service connections
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_SERVICE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
+GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+
+# Initialize the Supabase client for vector lookups
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+# Load the embedding model
+embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+# 3. Force Python to immediately purge model-loading cache from RAM
+gc.collect()
 
 from langchain_groq import ChatGroq
 from sentence_transformers import SentenceTransformer
