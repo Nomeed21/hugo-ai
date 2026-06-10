@@ -210,7 +210,7 @@
 
             } catch (error) {
                 console.error("Error calling backend:", error);
-                appendMessage("Error: Could not connect to your local FastAPI backend. Make sure your Uvicorn server is running on http://127.0.0.1:8000 !", "bot");
+                appendMessage("Error: Could not connect to the Server! Contact the administrators", "bot");
             }
 
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
