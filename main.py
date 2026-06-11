@@ -1,6 +1,7 @@
 import os
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -50,6 +51,19 @@ class ChatResponse(BaseModel):
     sources: list[SourceItem]
     confidence: float
 
+class FeedbackRequest(BaseModel):
+    session_id: str
+    message: str
+    response: str
+    rating: str  # "thumbs_up" or "thumbs_down"
+
+
+class FeedbackStats(BaseModel):
+    total: int
+    thumbs_up: int
+    thumbs_down: int
+    positive_ratio: float
+    
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "version": "1.0.0", "service": "hugo-ai"}
@@ -84,4 +98,45 @@ def chat(request: ChatRequest):
         confidence=result["confidence"],
     )
 
+@app.post("/feedback")
+def submit_feedback(request: FeedbackRequest):
+    from supabase import create_client
 
+    supabase_client = create_client(
+        os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"]
+    )
+
+    supabase_client.table("feedback").insert(
+        {
+            "session_id": request.session_id,
+            "message": request.message,
+            "response": request.response,
+            "rating": request.rating,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+    ).execute()
+
+    return {"status": "feedback recorded"}
+
+@app.get("/feedback/stats", response_model=FeedbackStats)
+def feedback_stats():
+    from supabase import create_client
+
+    supabase_client = create_client(
+        os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"]
+    )
+
+    result = supabase_client.table("feedback").select("rating").execute()
+    records = result.data if result.data else []
+
+    total = len(records)
+    thumbs_up = sum(1 for r in records if r["rating"] == "thumbs_up")
+    thumbs_down = total - thumbs_up
+    positive_ratio = thumbs_up / total if total > 0 else 0.0
+
+    return FeedbackStats(
+        total=total,
+        thumbs_up=thumbs_up,
+        thumbs_down=thumbs_down,
+        positive_ratio=round(positive_ratio, 2),
+    )
