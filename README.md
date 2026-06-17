@@ -2,125 +2,87 @@
 
 # Build a Production RAG Chatbot Backend
 
-**Project Link:** [View Project](https://learn.nextwork.org/projects/8c6ba6f3-b8de-48b3-82cf-da43478c6872)
+## Overview
 
-**Author:** Nurmid Mayo  
-**Email:** mayonurmid@gmail.com
+This project demonstrates the development and deployment of a production-ready Retrieval-Augmented Generation (RAG) chatbot backend. The system enables users to ask questions through a chat interface while ensuring responses are grounded in verified information stored within a vector database.
 
----
+The chatbot combines semantic search, large language models, source attribution, confidence scoring, and conversation memory to deliver accurate and context-aware responses while reducing hallucinations.
 
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_on918ceh)
+## Key Features
 
-## What I Built and Why
+* Retrieval-Augmented Generation (RAG) architecture
+* FastAPI REST API endpoints
+* Supabase pgvector for vector search
+* Groq-powered large language model integration
+* Confidence thresholding to prevent unreliable answers
+* Source attribution for response transparency
+* Session memory for multi-turn conversations
+* Feedback logging and analytics
+* Production deployment on Render
 
-### Project overview
+## Tech Stack
 
-In this project, I'm building a RAG pipeline so that it can be integrated to a website 
+* Python
+* FastAPI
+* Supabase
+* pgvector
+* Groq API
+* Render
+* GitHub
 
-## Deploying Hugo AI to Production
+## System Architecture
 
-### Deployment strategy
+```text
+User Query
+    ↓
+FastAPI Backend
+    ↓
+Embedding Model
+    ↓
+Supabase pgvector
+    ↓
+Document Retrieval
+    ↓
+Groq LLM
+    ↓
+Response + Sources + Confidence Score
+```
 
-In this step, I'm deploying configuration files so that the web team can actually call it.
+## Project Goal
 
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_on918ceh)
-
-### Live endpoint verification
-
-I sent a question about how to join and received a response that mentioned refer to the website with sources from /apply
-
-## Building the FastAPI Endpoints
-
-### API design goals
-
-In this step, I'm building a chat post endpoint with pydantic request/response models, add a healh get endpint and cors middle wair and test the full rag flow locally usin gswagger ui and curl so that the web team can call the pipeline easily.
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_92u2vs5a)
-
-### Response structure and confidence scoring
-
-The response includes responses, sources, and confidence.The confidence score matters because it determines how much data it recognize and answers.
-
-## Constructing the RAG Pipeline
-
-### Pipeline architecture
-
-In this step, I'm building the embedding model and groq llm clinet and retrieval funcitons so that Hugo can query Supabase vectore store and implement confidence thresholding to prevent low-quality answers
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_qobezdjz)
-
-### Confidence thresholding logic
-
-When the similarity score is below the threshold, Hugo will say that the question is out of its scope instead of giving irrelevant information and hallucinating
-
-## Engineering the System Prompt and Scope Enforcement
-
-### Prompt design goals
-
-In this step, I'm writing a system prompt so that Hugo can enforce examples, formats context and history, and declines off-topic queries
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_qjb75ued)
-
-### Handling off-topic queries
-
-When an off-topic query comes in, the pipeline returns with 0 confidence because the confidence is below the minimum threshold
-
-## Adding Session Memory and Source Attribution
-
-### Memory and attribution goals
-
-In this step, I'm setting up a session memory class so that I can store conversation which turns with automatic expiry, review how source attribution provides page and section references in every response, and test multi-turn conversations to verify follow-up questions resolve correctly.
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_kqzfyq65)
-
-### How session memory resolves follow-up questions
-
-Session memory stores the previous prompts and answers so the prompt includes the necessary data which lets Hugo resolve the insufficient prompt.
-
-## Configuring Supabase pgvector and Seeding Data
-
-### Vector database setup
-
-In this step, I'm setting up pgvector so that Hugo can search functions that ranks documents by relevance and seed the database with sample website content using a python script
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_fehh2bbp)
-
-### How match_documents works
-
-The match_documents function do is to search and compares datas.The threshold ensures all the answers are relevant and not includes any unrelated information
-
-## Setting Up the Development Environment
-
-### Environment setup goals
-
-In this step, I'm setting up python, groq, and supabase so that I can start building my RAG Pipeline
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_z1rua103)
-
-### Environment variables and service connections
-
-I configured groq, supabase url, & supabase service key which connects to groq llm and supabase
-
-## Bonus: Feedback Logging for Continuous Improvement
-
-![Image](https://learn.nextwork.org/sympathetic_purple_adorable_sow/uploads/8c6ba6f3-b8de-48b3-82cf-da43478c6872_dbv8r7uh)
-
-### Feedback stats and quality tracking
-
-In this project extension, the stats endpoint returns whether the user thumbs up or down the response of the chatbot.This helps because it can provide new data on what response is the best
+The goal of this project was to build a scalable and production-ready chatbot backend capable of answering user questions using verified website content. By implementing retrieval-based generation, confidence scoring, and source attribution, the system prioritizes factual accuracy and transparency over generic AI-generated responses.
 
 ## Reflections and Takeaways
 
-### Tools and concepts learned
+### What I Learned
 
-The key tools I used include supabase, groq api, render, and github. Key concepts I learnt include pipelining, seeding data, data management.
+Through this project, I gained hands-on experience with modern AI application development and production deployment. Key concepts and technologies included:
 
-### Time and challenges
+* Retrieval-Augmented Generation (RAG)
+* Vector databases and semantic search
+* Embedding generation
+* Prompt engineering
+* FastAPI backend development
+* API deployment and monitoring
+* Session memory management
+* Confidence-based response filtering
 
-This project took me approximately 2 days. The most challenging part was trying to optimize the storage use so that I can have the free tier of render.
+### Challenges
 
-I did this project today to learn how to set up a feeback response. Another skill I want to learn is improving the data and reducing the hallucination well.
+One of the biggest challenges was optimizing resource usage while staying within the limits of Render's free tier. This required careful management of storage, deployment configuration, and application performance.
 
----
+Another challenge was reducing hallucinations and ensuring responses remained relevant. Implementing confidence thresholding and retrieval-based grounding significantly improved response quality.
 
-*Built with [NextWork](https://learn.nextwork.org) - [View this project](https://learn.nextwork.org/projects/8c6ba6f3-b8de-48b3-82cf-da43478c6872)*
+### Future Improvements
+
+Potential enhancements include:
+
+* Advanced reranking models
+* Improved retrieval accuracy
+* Conversation summarization for long chats
+* Automated evaluation metrics
+* Expanded feedback analytics
+* Hybrid search combining keyword and semantic retrieval
+
+This project strengthened my understanding of how production AI systems are designed, deployed, and maintained beyond simple prototype implementations.
+
